@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>iRA Cafe System_POS</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #1b5e20; --danger: #ef5350; --info: #0288d1; --bg: #f8fafc; --dark: #0f172a; 
+            --coffee: #5d4037; --tea: #2e7d32; --milk: #0277bd; --spec: #d84315;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--dark); overflow: hidden; }
+        .sidebar { width: 100px; background: var(--dark); display: flex; flex-direction: column; align-items: center; padding-top: 30px; color: white; flex-shrink: 0; z-index: 100; }
+        .nav-tab { cursor: pointer; margin-bottom: 40px; text-align: center; font-size: 0.75rem; opacity: 0.5; width: 100%; transition: 0.3s; }
+        .nav-tab.active { opacity: 1; border-right: 4px solid #4ade80; color: #4ade80; }
+        .nav-tab i { font-size: 1.8rem; display: block; margin-bottom: 8px; font-style: normal; }
+        .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; -webkit-overflow-scrolling: touch; }
+        .view { display: none; padding: 25px; height: auto; overflow-y: auto; box-sizing: border-box; width: 100%; -webkit-overflow-scrolling: touch; }
+        .view.active { display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.3s ease; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .order-layout { display: flex; gap: 20px; height: 100%; overflow: hidden; }
+        .menu-scroll { flex: 2; overflow-y: auto; padding-right: 10px; padding-bottom: 100px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; align-content: start; }
+        .category-title { grid-column: 1 / -1; font-size: 0.9rem; font-weight: 800; padding: 12px 18px; margin-top: 25px; border-radius: 12px; color: white !important; text-transform: uppercase; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .cat-coffee { background: var(--coffee) !important; } .cat-tea { background: var(--tea) !important; } .cat-milk { background: var(--milk) !important; } .cat-spec { background: var(--spec) !important; }
+        .item-card { background: white; border-radius: 20px; padding: 15px; text-align: center; cursor: pointer; border: 1px solid #f1f5f9; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .item-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 12px 24px rgba(0,0,0,0.08); background: #f0fdf4; }
+        .item-card b { font-size: 0.85rem; display: block; margin-bottom: 8px; height: 35px; overflow: hidden; }
+        .item-card span { font-weight: 700; color: var(--primary); background: #dcfce7; padding: 5px 12px; border-radius: 30px; font-size: 0.75rem; }
+        .cart-panel { width: 380px; background: white; border-radius: 24px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #f1f5f9; box-shadow: -10px 0 30px rgba(0,0,0,0.02); }
+        .grand-banner { background: var(--dark); color: white; padding: 20px; border-radius: 18px; text-align: center; margin-bottom: 20px; }
+        .btn-pay { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 800; width: 100%; margin-top: 15px; font-size: 1.1rem; }
+        .dash-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-left: 8px solid #ccc; }
+        .card small { font-weight: 800; color: #64748b; text-transform: uppercase; font-size: 0.7rem; }
+        .card div { font-size: 1.3rem; font-weight: 800; margin-top: 5px; }
+        .table-container { background: white; border-radius: 20px; border: 1px solid #f1f5f9; overflow-y: auto; margin-top: 10px; max-height: 400px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+        th { background: #f8fafc; color: #64748b; font-weight: 800; text-transform: uppercase; }
+        tfoot td { background: #fdfdfd; font-weight: 800; border-top: 2px solid #eee; color: var(--dark); }
+        .btn-export { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .btn-delete { color: white; background: var(--danger); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 700; min-width: 50px; }
+        .btn-delete:active { transform: scale(0.95); }
+        .btn-edit { color: white; background: #ff9800; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 700; min-width: 50px; }
+        .btn-edit:active { transform: scale(0.95); }
+        @media (max-width: 900px) { body { flex-direction: column; } .sidebar { width: 100%; height: 70px; flex-direction: row; padding: 0; justify-content: space-around; } .order-layout { flex-direction: column; } .cart-panel { width: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="nav-tab active" onclick="showTab('pos', this)"><i>🛒</i>ORDER</div>
+        <div class="nav-tab" onclick="showTab('stock', this)"><i>📦</i>STOCK</div>
+        <div class="nav-tab" onclick="showTab('reports', this)"><i>📊</i>REPORTS</div>
+        <div class="nav-tab" onclick="factoryReset()" style="margin-top:auto; color:var(--danger);"><i>🗑️</i>RESET</div>
+    </div>
+    <div class="main">
+        <!-- 1. ORDERING (24 DRINKS) -->
+        <div id="pos" class="view active">
+            <div class="order-layout">
+                <div class="menu-scroll"><div class="menu-grid" id="menu"></div></div>
+                <div class="cart-panel">
+                    <div class="grand-banner"><small style="opacity:0.7">DAILY TOTAL INCOME</small><div id="daily-grand" style="font-size:1.8rem; font-weight:800">0 R</div></div>
+                    <h4 style="margin:0">Items in Cart (<span id="cart-qty">0</span>)</h4>
+                    <div id="cart-list" style="flex:1; overflow-y:auto; margin-top:15px"></div>
+                    <div style="background:#f1f8e9; padding:20px; border-radius:15px; margin-top:15px; border-left:6px solid var(--primary)">
+                        <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:1.2rem"><span>SUB-TOTAL:</span> <b id="cart-subtotal" style="color:var(--primary)">0 R</b></div>
+                    </div>
+                    <button class="btn-pay" onclick="saveSale()">CONFIRM & PAY</button>
+                    <button onclick="clearCart()" style="background:none; border:1px solid #ddd; padding:10px; border-radius:10px; margin-top:10px; cursor:pointer; width:100%; font-weight:bold; color:#888">CANCEL</button>
+                </div>
+            </div>
+        </div>
+        <!-- 2. STOCK INVENTORY (WITH SUMMARY DASHBOARD) -->
+        <div id="stock" class="view">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2 style="font-weight:800">Stock Inventory</h2>
+                <div style="display:flex; gap:10px;">
+                    <input type="date" id="stock-date-filter" onchange="renderStock()" style="padding:10px; border-radius:10px; border:1px solid #ccc;">
+                    <button class="btn-export" onclick="exportData('stock')">EXPORT STOCK</button>
+                </div>
+            </div>
+            <!-- STOCK SUMMARY DASHBOARD -->
+            <div class="dash-row">
+                <div class="card" style="border-left-color: #2196F3;"><small>Total Items in Stock</small><div id="dash-stock-items" style="color:#2196F3">0</div></div>
+                <div class="card" style="border-left-color: #4CAF50;"><small>Total Different Items</small><div id="dash-stock-unique" style="color:#4CAF50">0</div></div>
+                <div class="card" style="border-left-color: #FF6F00;"><small>Total Stock Cost ($)</small><div id="dash-stock-cost">$0</div></div>
+            </div>
+            <!-- ADD STOCK FORM -->
+            <div style="display:flex; gap:12px; background:white; padding:25px; border-radius:20px; border:1px solid #ddd; flex-wrap:wrap">
+                <input type="text" id="s-name" placeholder="Item Name">
+                <input type="text" id="s-qty" placeholder="QTY (e.g. 5kg)">
+                <input type="number" id="s-cost" placeholder="Total Cost ($)" step="0.01">
+                <button onclick="addStock()" class="btn-pay" style="width:auto; padding:0 40px; margin:0">SAVE STOCK</button>
+            </div>
+            <!-- STOCK TABLE -->
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>ID No.</th><th>Date</th><th>Item</th><th>QTY</th><th>Cost ($)</th><th>Action</th></tr></thead>
+                    <tbody id="stock-body"></tbody>
+                    <tfoot><tr><td colspan="4" style="text-align:right">TOTAL FILTERED SPEND ($):</td><td id="sum-stock-usd">$0</td><td></td></tr></tfoot>
+                </table>
+            </div>
+        </div>
+        <!-- 3. REPORTS & NET PROFIT -->
+        <div id="reports" class="view">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+                <h2 style="font-weight:800">Analytics & Net Profit</h2>
+                <div style="display:flex; gap:10px;">
+                    <input type="date" id="date-filter" onchange="refreshReports()" style="padding:10px; border-radius:10px; border:1px solid #ccc;">
+                    <button class="btn-export" onclick="exportData('sales')">EXPORT REPORTS</button>
+                </div>
+            </div>
+            <div class="dash-row">
+                <div class="card" style="border-left-color: var(--primary);"><small>Total Sales Income</small><div id="dash-income">0 R</div></div>
+                <div class="card" style="border-left-color: #ff9800;"><small>Total Cups Sold</small><div id="dash-cups" style="color:#ff9800; font-size:1.8rem">0</div></div>
+                <div class="card" style="border-left-color: var(--danger);"><small>Total Cost (Cup+Stock)</small><div id="dash-total-cost">0 R</div></div>
+                <div class="card" style="border-left-color: var(--spec); background:#f0fdf4;"><small>NET PROFIT (NetPF)</small><div id="dash-net-profit" style="color:var(--primary)">0 R</div></div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Serial</th><th>Date</th><th>Drink</th><th>Income</th><th>Cup Expend</th><th>Profit/Cup</th><th>Action</th></tr></thead>
+                    <tbody id="report-body"></tbody>
+                    <tfoot style="background:#f8fafc; font-weight:800;"><tr><td colspan="3" style="text-align:right">PAGE SUB-TOTALS:</td><td id="sum-inc">0 R</td><td id="sum-exp">0 R</td><td id="sum-prof">0 R</td></tr></tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- EDIT STOCK MODAL -->
+    <div id="editStockModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:white; padding:30px; border-radius:20px; width:90%; max-width:400px; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+            <h3 style="margin:0 0 20px 0; font-weight:800;">Edit Stock Item</h3>
+            <input type="text" id="edit-s-name" placeholder="Item Name" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+            <input type="text" id="edit-s-qty" placeholder="QTY (e.g. 5kg)" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+            <input type="number" id="edit-s-cost" placeholder="Total Cost ($)" step="0.01" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+            <div style="display:flex; gap:10px;">
+                <button onclick="saveEditStock()" class="btn-pay" style="flex:1; margin:0;">SAVE</button>
+                <button onclick="closeEditModal()" style="flex:1; background:none; border:1px solid #ddd; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; color:#888;">CANCEL</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let sales = JSON.parse(localStorage.getItem('ira_v8_sales')) || [];
+        let stock = JSON.parse(localStorage.getItem('ira_v8_stock')) || [];
+        let cart = [];
+        let editingStockId = null; // Global variable for editing
+        const drinks = [
+            // CATEGORY: ICED COFFEE
+            { n: 'Iced Americano', p: 5000, c: 1200, cat: 'Iced Coffee' },
+            { n: 'Iced Latte', p: 5000, c: 1800, cat: 'Iced Coffee' },
+            { n: 'Iced Cappuccino', p: 5000, c: 1900, cat: 'Iced Coffee' },
+            { n: 'Iced Mocha', p: 5000, c: 2100, cat: 'Iced Coffee' },
+            { n: 'Iced Condensed Milk Coffee', p: 5000, c: 1800, cat: 'Iced Coffee' },
+            // CATEGORY: HOT COFFEE
+            { n: 'Hot Latte', p: 5000, c: 2200, cat: 'Hot Coffee' },
+            { n: 'Hot Cappuccino', p: 5000, c: 1900, cat: 'Hot Coffee' },
+            { n: 'Hot Americano', p: 5000, c: 1100, cat: 'Hot Coffee' },
+            { n: 'Hot Mocha', p: 5000, c: 2000, cat: 'Hot Coffee' },
+            // CATEGORY: TEA & FRUIT
+            { n: 'Iced Green/Red Tea', p: 5000, c: 1700, cat: 'Tea & Fruit' },
+            { n: 'Iced Coconut Green/Red Tea', p: 6000, c: 2300, cat: 'Tea & Fruit' },
+            { n: 'Iced Lemon Tea', p: 5000, c: 1400, cat: 'Tea & Fruit' },
+            { n: 'Iced Passion Soda', p: 6000, c: 1600, cat: 'Tea & Fruit' },
+            { n: 'Strawberry Smoothie', p: 6000, c: 2200, cat: 'Tea & Fruit' },
+            // CATEGORY: MILK SERIES
+            { n: 'Iced Strawberry Milk', p: 6000, c: 1900, cat: 'Milk Series' },
+            { n: 'Iced Blueberry Milk', p: 6000, c: 1900, cat: 'Milk Series' },
+            { n: 'Iced Grape Milk', p: 6000, c: 1900, cat: 'Milk Series' },
+            { n: 'Iced Orange Milk', p: 6000, c: 1900, cat: 'Milk Series' },
+            { n: 'Iced Milk Chocolate', p: 6000, c: 2000, cat: 'Milk Series' },
+            { n: 'Iced Passion Milk', p: 6000, c: 2000, cat: 'Milk Series' },
+            { n: 'Iced Passion Cream', p: 6000, c: 2000, cat: 'Milk Series' },
+            // CATEGORY: MATCHA
+            { n: 'Matcha Iced Latte', p: 6000, c: 2100, cat: 'Matcha & Spec' },
+            { n: 'Matcha Iced Latte Cream', p: 6000, c: 2100, cat: 'Matcha & Spec' },
+            { n: 'Matcha Iced Latte Caramel', p: 6000, c: 2100, cat: 'Matcha & Spec' },
+            { n: 'Matcha Strawberry', p: 6000, c: 2400, cat: 'Matcha & Spec' },
+             { n: 'Matcha Blueberry', p: 6000, c: 2400, cat: 'Matcha & Spec' },
+            { n: 'Matcha Grape', p: 6000, c: 2400, cat: 'Matcha & Spec' },
+            { n: 'Chocolate Frappe', p: 6000, c: 2500, cat: 'Matcha & Spec' },
+            { n: 'Crushed Ice', p: 2000, c: 800, cat: 'Matcha & Spec' }
+        ];
+        function init() { renderMenu(); renderPOS(); renderStock(); refreshReports(); } 
+        function renderMenu() {
+            const m = document.getElementById('menu'); m.innerHTML = ''; let currentCat = '';
+            drinks.forEach(d => {
+                if (d.cat !== currentCat) { currentCat = d.cat; const cls = currentCat.includes('Coffee') ? 'cat-coffee' : currentCat.includes('Tea') ? 'cat-tea' : currentCat.includes('Milk') ? 'cat-milk' : 'cat-spec';
+                    m.innerHTML += `<div class="category-title ${cls}">${currentCat}</div>`;
+                }
+                m.innerHTML += `<div class="item-card" onclick="addToCart('${d.n}')"><b>${d.n}</b><span>${d.p.toLocaleString()} R</span></div>`;
+            });
+        } 
+        function addToCart(name) { const d = drinks.find(i => i.n === name); cart.push({ ...d, mp: d.p }); renderPOS(); }
+        function renderPOS() {
+            const list = document.getElementById('cart-list'); list.innerHTML = ''; let sub = 0;
+            cart.forEach((item, i) => { 
+                sub += parseInt(item.mp);
+                list.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;"><span style="flex:1">${item.n}</span><input type="number" style="width:70px;text-align:right;border:1px solid #ddd;background:#f1f8e9;padding:8px;border-radius:5px;font-weight:800" value="${item.mp}" onchange="updateCartItem(${i}, this.value)"><button class="btn-delete" onclick="removeFromCart(${i})">DEL</button></div>`;
+            });
+            document.getElementById('cart-subtotal').innerText = sub.toLocaleString() + " R";
+            document.getElementById('cart-qty').innerText = cart.length;
+            document.getElementById('daily-grand').innerText = sales.filter(s => s.date === new Date().toLocaleDateString()).reduce((acc, s) => acc + s.inc, 0).toLocaleString() + " R";
+        }
+        function updateCartItem(i, val) { cart[i].mp = parseInt(val) || cart[i].p; renderPOS(); }
+        function removeFromCart(i) { cart.splice(i, 1); renderPOS(); }
+        function saveSale() {
+            if(!cart.length) return;
+            const date = new Date().toLocaleDateString();
+            cart.forEach(item => { sales.push({ id: "S-" + (sales.length + 1).toString().padStart(5, '0'), rawId: Date.now() + Math.random(), date, n: item.n, inc: parseInt(item.mp), exp: item.c, prof: item.mp - item.c }); });
+            localStorage.setItem('ira_v8_sales', JSON.stringify(sales));
+            cart = []; renderPOS(); refreshReports(); alert("Success!");
+        }
+        function addStock() {
+            const n = document.getElementById('s-name').value, q = document.getElementById('s-qty').value, c = document.getElementById('s-cost').value;
+            if(!n || !q || !c) return alert("Fill all fields!");
+            stock.push({ id: "IN-" + (stock.length + 1).toString().padStart(5, '0'), rawId: Date.now(), date: new Date().toLocaleDateString(), n, q, c: parseFloat(c) });
+            localStorage.setItem('ira_v8_stock', JSON.stringify(stock));
+            renderStock(); refreshReports(); document.getElementById('s-name').value=''; document.getElementById('s-qty').value=''; document.getElementById('s-cost').value='';
+        }
+        function renderStock() {
+            const p = document.getElementById('stock-date-filter').value;
+            const target = p ? new Date(p).toLocaleDateString() : null;
+            const b = document.getElementById('stock-body'); b.innerHTML = '';
+            let totalUSD = 0, totalItems = 0, uniqueItems = new Set(); 
+            stock.forEach((s) => {
+                if (!target || s.date === target) {
+                    totalUSD += s.c;
+                    totalItems += 1;
+                    uniqueItems.add(s.n); // Track unique item names
+                    b.insertAdjacentHTML('afterbegin', `<tr><td>${s.id}</td><td>${s.date}</td><td>${s.n}</td><td>${s.q}</td><td>$${s.c}</td><td><button class="btn-edit" onclick="editStock(${s.rawId})">EDIT</button> <button class="btn-delete" onclick="delStock(${s.rawId})">DEL</button></td></tr>`);
+                }
+            });  
+            document.getElementById('sum-stock-usd').innerText = "$" + totalUSD.toLocaleString();
+            document.getElementById('dash-stock-items').innerText = totalItems; // Total items in stock
+            document.getElementById('dash-stock-unique').innerText = uniqueItems.size; // Unique items
+            document.getElementById('dash-stock-cost').innerText = "$" + totalUSD.toFixed(2); // Total cost
+        }
+        function editStock(rawId) {
+            const stockItem = stock.find(s => s.rawId === rawId);
+            if (!stockItem) return;  
+            editingStockId = rawId;
+            document.getElementById('edit-s-name').value = stockItem.n;
+            document.getElementById('edit-s-qty').value = stockItem.q;
+            document.getElementById('edit-s-cost').value = stockItem.c;
+            document.getElementById('editStockModal').style.display = 'flex';
+        }
+        function saveEditStock() {
+            const stockItem = stock.find(s => s.rawId === editingStockId);
+            if (!stockItem) return;   
+            const n = document.getElementById('edit-s-name').value;
+            const q = document.getElementById('edit-s-qty').value;
+            const c = document.getElementById('edit-s-cost').value;
+            if(!n || !q || !c) return alert("Fill all fields!");
+            stockItem.n = n;
+            stockItem.q = q;
+            stockItem.c = parseFloat(c); 
+            localStorage.setItem('ira_v8_stock', JSON.stringify(stock));
+            renderStock();
+            refreshReports();
+            closeEditModal();
+        }
+        function closeEditModal() {
+            document.getElementById('editStockModal').style.display = 'none';
+            editingStockId = null;
+        } 
+        function refreshReports() {
+            const EXCHANGE_RATE = 4000; // Fixed exchange rate: 4,000R = 1 USD
+            const p = document.getElementById('date-filter').value;
+            const target = p ? new Date(p).toLocaleDateString() : null;
+            const body = document.getElementById('report-body'); body.innerHTML = '';
+            let totalInc = 0, totalExp = 0, totalStockSpend = 0, totalCups = 0;
+            
+            sales.forEach(s => {
+                if (!target || s.date === target) {
+                    totalInc += s.inc; 
+                    totalExp += s.exp;
+                    totalCups += 1; // Count each sale as 1 cup
+                    body.insertAdjacentHTML('afterbegin', `<tr><td>${s.id}</td><td>${s.date}</td><td>${s.n}</td><td>${s.inc.toLocaleString()}</td><td>${s.exp.toLocaleString()}</td><td style="color:green;font-weight:800">${s.prof.toLocaleString()}</td><td><button class="btn-delete" onclick="delSale(${s.rawId})">DELETE</button></td></tr>`);
+                }
+            });
+             
+            stock.forEach(st => { if (!target || st.date === target) totalStockSpend += (st.c * EXCHANGE_RATE); });
+            document.getElementById('dash-income').innerText = totalInc.toLocaleString() + " R";
+            document.getElementById('dash-cups').innerText = totalCups; // Display total cups
+            document.getElementById('dash-total-cost').innerText = (totalExp + totalStockSpend).toLocaleString() + " R";
+            document.getElementById('dash-net-profit').innerText = (totalInc - (totalExp + totalStockSpend)).toLocaleString() + " R";
+            document.getElementById('sum-inc').innerText = totalInc.toLocaleString() + " R";
+            document.getElementById('sum-exp').innerText = totalExp.toLocaleString() + " R";
+            document.getElementById('sum-prof').innerText = (totalInc - totalExp).toLocaleString() + " R";
+        }   
+        function exportData(type) {
+            let csv = "ID,Date,Name,QTY/Income,Cost/Expend\n";
+            const data = type === 'sales' ? sales : stock;
+            data.forEach(d => csv += `${d.id},${d.date},${d.n},${d.inc || d.q},${d.exp || d.c}\n`);
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv'})); a.download = `ira_${type}.csv`; a.click();
+        } 
+        function showTab(id, el) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); document.getElementById(id).classList.add('active'); el.classList.add('active'); }
+        function factoryReset() { if(confirm("DELETE ALL DATA FOREVER?")) { localStorage.clear(); location.reload(); } }
+        function clearCart() { cart = []; renderPOS(); }
+        function delStock(id) { if(confirm("Delete this stock?")) { stock = stock.filter(s => s.rawId !== id); localStorage.setItem('ira_v8_stock', JSON.stringify(stock)); renderStock(); refreshReports(); } }
+        function delSale(id) { if(confirm("Delete this sale?")) { sales = sales.filter(s => s.rawId !== id); localStorage.setItem('ira_v8_sales', JSON.stringify(sales)); refreshReports(); renderPOS(); } }
+        function resetFilter() { document.getElementById('date-filter').value = ''; document.getElementById('stock-date-filter').value = ''; renderStock(); refreshReports(); }
+        init();
+    </script>
+</body>
+</html>
