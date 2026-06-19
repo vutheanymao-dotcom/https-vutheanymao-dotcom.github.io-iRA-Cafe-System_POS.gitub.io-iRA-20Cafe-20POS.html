@@ -147,46 +147,49 @@
         let cart = [];
         let editingStockId = null; // Global variable for editing
         const drinks = [
-            // CATEGORY: ICED COFFEE
-            { n: 'Iced Americano', p: 5000, c: 1200, cat: 'Iced Coffee' },
-            { n: 'Iced Latte', p: 5000, c: 1800, cat: 'Iced Coffee' },
-            { n: 'Iced Cappuccino', p: 5000, c: 1900, cat: 'Iced Coffee' },
-            { n: 'Iced Mocha', p: 5000, c: 2100, cat: 'Iced Coffee' },
-            { n: 'Iced Condensed Milk Coffee', p: 5000, c: 1800, cat: 'Iced Coffee' },
-            // CATEGORY: HOT COFFEE
-            { n: 'Hot Latte', p: 5000, c: 2200, cat: 'Hot Coffee' },
-            { n: 'Hot Cappuccino', p: 5000, c: 1900, cat: 'Hot Coffee' },
-            { n: 'Hot Americano', p: 5000, c: 1100, cat: 'Hot Coffee' },
-            { n: 'Hot Mocha', p: 5000, c: 2000, cat: 'Hot Coffee' },
-            // CATEGORY: TEA & FRUIT
-            { n: 'Iced Green/Red Tea', p: 5000, c: 1700, cat: 'Tea & Fruit' },
-            { n: 'Iced Coconut Green/Red Tea', p: 6000, c: 2300, cat: 'Tea & Fruit' },
-            { n: 'Iced Lemon Tea', p: 5000, c: 1400, cat: 'Tea & Fruit' },
-            { n: 'Iced Passion Soda', p: 6000, c: 1600, cat: 'Tea & Fruit' },
-            { n: 'Strawberry Smoothie', p: 6000, c: 2200, cat: 'Tea & Fruit' },
-            { n: 'Blueberry Smoothie', p: 6000, c: 2200, cat: 'Tea & Fruit' },
-            // CATEGORY: MILK SERIES
-            { n: 'Iced Strawberry Milk', p: 6000, c: 1900, cat: 'Milk Series' },
-            { n: 'Iced Blueberry Milk', p: 6000, c: 1900, cat: 'Milk Series' },
-            { n: 'Iced Grape Milk', p: 6000, c: 1900, cat: 'Milk Series' },
-            { n: 'Iced Orange Milk', p: 6000, c: 1900, cat: 'Milk Series' },
-            { n: 'Iced Milk Chocolate', p: 6000, c: 2000, cat: 'Milk Series' },
-            { n: 'Iced Passion Milk', p: 5000, c: 2000, cat: 'Milk Series' },
-            { n: 'Iced Passion Cream', p: 6000, c: 2000, cat: 'Milk Series' },
-            // CATEGORY: MATCHA
-            { n: 'Matcha Iced Latte', p: 6000, c: 2100, cat: 'Matcha & Spec' },
-            { n: 'Matcha Iced Latte Cream', p: 6000, c: 2100, cat: 'Matcha & Spec' },
-            { n: 'Matcha Iced Latte Caramel', p: 6000, c: 2100, cat: 'Matcha & Spec' },
-            { n: 'Brown Sugar Iced Latte Caramel', p: 6000, c: 2100, cat: 'Matcha & Spec' },
-            { n: 'Matcha Strawberry', p: 6000, c: 2400, cat: 'Matcha & Spec' },
-            { n: 'Matcha Blueberry', p: 6000, c: 2400, cat: 'Matcha & Spec' },
-            { n: 'Matcha Grape', p: 6000, c: 2400, cat: 'Matcha & Spec' },
-            { n: 'Chocolate Frappe', p: 6000, c: 2500, cat: 'Matcha & Spec' },
-            { n: 'Strawberry Soda', p: 6000, c: 2400, cat: 'Matcha & Spec' },
-            { n: 'Blueberry Soda', p: 6000, c: 2400, cat: 'Matcha & Spec' },
-            { n: 'Roselle Juice', p: 6000, c: 2400, cat: 'Matcha & Spec' },
-            { n: 'Crushed Ice', p: 2000, c: 800, cat: 'Matcha & Spec' }
-        ];
+                    // CATEGORY: ICED COFFEE
+                    { n: 'Iced Americano', p: 5000, c: 1200, cat: 'Iced Coffee' },
+                    { n: 'Iced Latte', p: 5000, c: 1800, cat: 'Iced Coffee' },
+                    { n: 'Iced Cappuccino', p: 5000, c: 1900, cat: 'Iced Coffee' },
+                    { n: 'Iced Mocha', p: 5000, c: 2100, cat: 'Iced Coffee' },
+                    { n: 'Iced Condensed Milk Coffee', p: 5000, c: 1800, cat: 'Iced Coffee' },
+                    // CATEGORY: HOT COFFEE
+                    { n: 'Hot Latte', p: 5000, c: 2200, cat: 'Hot Coffee' },
+                    { n: 'Hot Cappuccino', p: 5000, c: 1900, cat: 'Hot Coffee' },
+                    { n: 'Hot Americano', p: 5000, c: 1100, cat: 'Hot Coffee' },
+                    { n: 'Hot Mocha', p: 5000, c: 2000, cat: 'Hot Coffee' },
+                    // CATEGORY: TEA & FRUIT
+                    { n: 'Iced Green/Red Tea', p: 5000, c: 1700, cat: 'Tea & Fruit' },
+                    { n: 'Iced Coconut Green/Red Tea', p: 6000, c: 2300, cat: 'Tea & Fruit' },
+                    { n: 'Iced Lemon Tea', p: 5000, c: 1400, cat: 'Tea & Fruit' },
+                    { n: 'Iced Passion Soda', p: 6000, c: 1600, cat: 'Tea & Fruit' },
+                    { n: 'Strawberry Smoothie', p: 6000, c: 2200, cat: 'Tea & Fruit' },
+                    { n: 'Blueberry Smoothie', p: 6000, c: 2200, cat: 'Tea & Fruit' },
+                    { n: 'Jusmine Tea', p: 5000, c: 2200, cat: 'Tea & Fruit' },
+                    { n: 'Oolong Tea', p: 5000, c: 2200, cat: 'Tea & Fruit' },
+                    { n: 'Roselle Juice', p: 5000, c: 2200, cat: 'Tea & Fruit' },
+                    // CATEGORY: MILK SERIES
+                    { n: 'Iced Strawberry Milk', p: 6000, c: 1900, cat: 'Milk Series' },
+                    { n: 'Iced Blueberry Milk', p: 6000, c: 1900, cat: 'Milk Series' },
+                    { n: 'Iced Grape Milk', p: 6000, c: 1900, cat: 'Milk Series' },
+                    { n: 'Iced Orange Milk', p: 6000, c: 1900, cat: 'Milk Series' },
+                    { n: 'Iced Milk Chocolate', p: 6000, c: 2000, cat: 'Milk Series' },
+                    { n: 'Iced Passion Milk', p: 5000, c: 2000, cat: 'Milk Series' },
+                    { n: 'Iced Passion Cream', p: 6000, c: 2000, cat: 'Milk Series' },
+                    // CATEGORY: MATCHA
+                    { n: 'Matcha Iced Latte', p: 6000, c: 2100, cat: 'Matcha & Spec' },
+                    { n: 'Matcha Iced Latte Cream', p: 6000, c: 2100, cat: 'Matcha & Spec' },
+                    { n: 'Matcha Iced Latte Caramel', p: 6000, c: 2100, cat: 'Matcha & Spec' },
+                    { n: 'Brown Sugar Iced Latte Caramel', p: 6000, c: 2100, cat: 'Matcha & Spec' },
+                    { n: 'Brown Sugar Milk', p: 5000, c: 2100, cat: 'Matcha & Spec' },
+                    { n: 'Matcha Strawberry', p: 6000, c: 2400, cat: 'Matcha & Spec' },
+                    { n: 'Matcha Blueberry', p: 6000, c: 2400, cat: 'Matcha & Spec' },
+                    { n: 'Matcha Grape', p: 6000, c: 2400, cat: 'Matcha & Spec' },
+                    { n: 'Chocolate Frappe', p: 6000, c: 2500, cat: 'Matcha & Spec' },
+                    { n: 'Strawberry Soda', p: 6000, c: 2400, cat: 'Matcha & Spec' },
+                    { n: 'Blueberry Soda', p: 6000, c: 2400, cat: 'Matcha & Spec' },
+                    { n: 'Crushed Ice', p: 2000, c: 800, cat: 'Matcha & Spec' }
+                ];
         function init() { renderMenu(); renderPOS(); renderStock(); refreshReports(); } 
         function renderMenu() {
             const m = document.getElementById('menu'); m.innerHTML = ''; let currentCat = '';
