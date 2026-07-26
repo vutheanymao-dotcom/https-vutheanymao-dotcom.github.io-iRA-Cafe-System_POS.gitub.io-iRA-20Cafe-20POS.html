@@ -142,8 +142,8 @@
         </div>
     </div>
     <script>
-        let sales = JSON.parse(localStorage.getItem('ira_v8_sales')) || [];
-        let stock = JSON.parse(localStorage.getItem('ira_v8_stock')) || [];
+        let sales = JSON.parse(localStorage.getItem('ira_v8_sales')) || JSON.parse(localStorage.getItem('sales')) || JSON.parse(localStorage.getItem('ira_sales')) || [];
+        let stock = JSON.parse(localStorage.getItem('ira_v8_stock')) || JSON.parse(localStorage.getItem('stock')) || JSON.parse(localStorage.getItem('ira_stock')) || [];
         let cart = [];
         let editingStockId = null; // Global variable for editing
         const drinks = [
